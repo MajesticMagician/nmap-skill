@@ -6,12 +6,12 @@ import nmap
 LOGGER = getLogger(__name__)
 
 class NmapSkill(MycroftSkill):
-    
+
     def initialize(self):
         scan_intent = IntentBuilder("ScanIntent"). \
             require("ScanKeyword").require("Host").build()
         self.register_intent(scan_intent, self.handle_scan_intent)
-        
+
         local_scan = IntentBuilder("LocalScan"). \
             require("ScanKeyword").require("LocalNetworkKeyword").build()
         self.register_intent(local_scan, self.handle_local_scan)
@@ -19,6 +19,10 @@ class NmapSkill(MycroftSkill):
         simple_local_scan = IntentBuilder("SimpleLocalScan"). \
             require("SimpleScanKeyword").require("LocalNetworkKeyword").build()
         self.register_intent(simple_local_scan, self.handle_simple_local_scan)
+
+        simple_tmn_scan = IntentBuilder("ScanTMNKeyword"). \
+            require("ScanTMNKeyword").build()
+        self.register_intent(simple_tmn_scan, self.handle_tmn_scan)
 
     def handle_scan_intent(self, message):
         h = message.data.get('utterance').replace('scan ','').replace(' ', '')
@@ -29,6 +33,9 @@ class NmapSkill(MycroftSkill):
 
     def handle_simple_local_scan(self, message):
         self.nmap_scan("192.168.1.*", '-sn -A')
+
+    def handle_tmn_scan(self, message):
+        self.nmap_scan("play.themajesticnetwork.com", '-sn -A')
 
     def nmap_scan(self,h, args):
         self.speak("Scan started, this may take a while")
